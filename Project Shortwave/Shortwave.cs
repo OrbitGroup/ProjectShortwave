@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
@@ -25,6 +26,8 @@ namespace Project_Shortwave
         }
         static async Task monitorMarkets() //print the timestamp and correlation of markets every 0.5 seconds. Format is comma delineated to be easily workable in excel/PowerBI
         {
+            string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            StreamWriter outputFile = new StreamWriter(Path.Combine(docPath, "test.txt"));
             await Task.Delay(2000);
             while(binanceMarkets.Count > 0 && bitrueMarkets.Count > 0 )
             {
@@ -36,7 +39,10 @@ namespace Project_Shortwave
                     if(bitrueMarkets[binanceMarket.Key].askPrice != 0 && binanceMarket.Value.lastPrice != 0)
                     {
                         correlation = Math.Round(binanceMarket.Value.lastPrice / bitrueMarkets[binanceMarket.Key].askPrice, 3);
-                        Console.WriteLine($"Time,{timeNow},{binanceMarket.Key},Binance_Price,{binanceMarket.Value.lastPrice},Bitrue_Price,{bitrueMarkets[binanceMarket.Key].askPrice},Correlation,{correlation}");
+                        //Console.WriteLine($"Time,{timeNow},{binanceMarket.Key},Binance_Price,{binanceMarket.Value.lastPrice},Bitrue_Price,{bitrueMarkets[binanceMarket.Key].askPrice},Correlation,{correlation}");
+                        string outputText = $"{timeNow},{binanceMarket.Key},{binanceMarket.Value.lastPrice},{bitrueMarkets[binanceMarket.Key].askPrice},{correlation}";
+                        Console.WriteLine(outputText);
+                        outputFile.WriteLine(outputText);
                     }
                     await Task.Delay(500);
                 }

@@ -20,15 +20,17 @@ namespace Project_Shortwave
         {
             var httpClient = new HttpClient();
             var bitrueinfo = JsonDocument.ParseAsync(httpClient.GetStreamAsync("https://www.bitrue.com/api/v1/exchangeInfo").Result).Result.RootElement;
-            rateLimit = bitrueinfo.GetProperty("rateLimits")[0].GetProperty("limit").GetInt16();
-            var interval = bitrueinfo.GetProperty("rateLimits")[0].GetProperty("interval").GetString();
+
+            //rateLimit = bitrueinfo.GetProperty("rateLimits")[0].GetProperty("limit").GetInt16();
+            rateLimit = 1;
+            /*var interval = bitrueinfo.GetProperty("rateLimits")[0].GetProperty("interval").GetString();
             if(interval == "MINUTES")
             {
                 rateLimit = rateLimit / 60;
             } else
             {
                 Console.WriteLine($"interval was {interval}");
-            }
+            }*/
         }
         public async Task listenBitrue()
         {
