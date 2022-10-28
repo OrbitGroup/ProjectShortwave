@@ -25,7 +25,7 @@ namespace Project_Shortwave
                 market.exchange = "binance";
                 ProjectShortwave.binanceMarkets.TryAdd(ticker, market);
                 var cts = new CancellationToken();
-                await client.SendAsync(new ArraySegment<byte>(Encoding.ASCII.GetBytes($"{{\"method\": \"SUBSCRIBE\",\"params\": [\"{ticker.ToLower()}@aggTrade\"], \"id\": {ID} }}")), WebSocketMessageType.Text, true, cts);
+                await client.SendAsync(new ArraySegment<byte>(Encoding.ASCII.GetBytes($"{{\"method\": \"SUBSCRIBE\",\"params\": [\"{ticker.ToLower()}@ticker\"], \"id\": {ID} }}")), WebSocketMessageType.Text, true, cts);
                 await Task.Delay(500); //wait 500 ms for the connection to be established
                 ID++;
             }
@@ -49,8 +49,12 @@ namespace Project_Shortwave
                         if(rootelement.TryGetProperty("e", out var _)) //the property 'e' is given for trade messages
                         {
                             var symbol = rootelement.GetProperty("s").GetString();   
-                            var price = decimal.Parse(rootelement.GetProperty("p").GetString());
-                            ProjectShortwave.binanceMarkets[symbol].lastPrice = price;
+                            ProjectShortwave.binanceMarkets[symbol].lastPrice = decimal.Parse(rootelement.GetProperty("p").GetString());
+                            ProjectShortwave.binanceMarkets[symbol].askPrice = decimal.Parse(rootelement.GetProperty("a").GetString());
+                            ProjectShortwave.binanceMarkets[symbol].askSize = decimal.Parse(rootelement.GetProperty("A").GetString());
+                            ProjectShortwave.binanceMarkets[symbol].bidPrice = decimal.Parse(rootelement.GetProperty("b").GetString());
+                            ProjectShortwave.binanceMarkets[symbol].bidSize = decimal.Parse(rootelement.GetProperty("B").GetString());
+                            ProjectShortwave.binanceMarkets[symbol].dailyVolume = decimal.Parse(rootelement.GetProperty("q").GetString());
                             ProjectShortwave.binanceMarkets[symbol].timeStamp = DateTime.UtcNow;
                         }
                     }
